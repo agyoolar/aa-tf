@@ -1,0 +1,9 @@
+{
+  "name": "The Floor",
+  "short_name": "The Floor",
+  "display": "standalone",
+  "start_url": "./",
+  "scope": "./",
+  "background_color": "#070708",
+  "theme_color": "#070708"
+}
