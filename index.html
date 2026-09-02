@@ -377,7 +377,8 @@ function shortEv(ev){
   if (/OT reflection due/i.test(ev.title)) return "OT reflection due tonight";
   if (/Marketing due/i.test(name)) return "Marketing due tonight";
   if (/DMV/i.test(ev.title)) return "DMV 3pm";
-  let t = ev.t.replace(/:00/g, "").replace(/\s*am/gi, "").replace(/\s*pm/gi, "");
+  /* Keep full start–end ranges; compact :00 only. Never strip am/pm (end period must stay). */
+  let t = String(ev.t || "").replace(/:00/g, "");
   const opt = /optional/i.test(ev.note || "") ? " optional" : "";
   if (/Newport/i.test(name)) return "Newport optional " + t;
   if (/St Monica/i.test(name)) return "St Monica sits on Marketing";
