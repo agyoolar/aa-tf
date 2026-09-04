@@ -1,1 +1,511 @@
-file:///tmp/create_content.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="The Floor">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#070708">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json">
+<title>The Floor</title>
+<style>
+  :root {
+    --bg:#070708; --card:#12131a; --line:#1c1d24; --ink:#ddd9d0; --bright:#f4f0e6;
+    --mute:#8a8680; --gold:#eec43a; --deep:#514315;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif;padding:18px 14px 96px;-webkit-tap-highlight-color:transparent}
+  .eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin:0 0 6px}
+  h1{font-family:Georgia,serif;font-size:36px;font-weight:500;margin:0 0 2px;color:var(--bright)}
+  .pillars{color:var(--mute);font-size:13px;margin:0 0 14px}
+  .hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0 14px}
+  .hero div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+  .hero b{display:block;font-size:26px;color:var(--bright);font-family:ui-monospace,monospace}
+  .hero span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 12px}
+  h2{margin:0 0 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .tick{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.35}
+  .tick:last-child{border-bottom:0}
+  .tick small{display:block;color:var(--mute);font-size:12px;margin-top:2px}
+  input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:var(--gold);flex-shrink:0}
+  input[type=date]{background:#0c0d12;color:var(--bright);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  .note{color:var(--mute);font-size:13px;margin:8px 0 0;line-height:1.4}
+  .money{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .money:last-child{border-bottom:0}
+  .plus{color:#9adf8a} .minus{color:#eb4c57}
+  .works{font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .works:last-child{border-bottom:0}
+  .works em{color:var(--gold);font-style:normal;font-size:11px;letter-spacing:.08em}
+  button{background:#0c0d12;color:var(--bright);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .foot{color:var(--mute);font-size:12px;margin-top:18px}
+
+  /* Interactive week */
+  .week{margin:0 0 14px}
+  .week > h2{margin:0 0 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .now{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:10px 12px;margin:0 0 12px;font-size:13px;line-height:1.4;color:var(--bright)}
+  .now b{color:var(--gold);font-weight:600}
+  .day-strip{
+    display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scroll-snap-type:x mandatory;padding:2px 2px 10px;margin:0 -2px;
+    scrollbar-width:none;
+  }
+  .day-strip::-webkit-scrollbar{display:none}
+  .day-pill{
+    flex:0 0 calc((100% - 36px) / 7);
+    min-width:46px;max-width:56px;
+    scroll-snap-align:center;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:10px 4px 8px;text-align:center;cursor:pointer;
+    color:var(--ink);font:inherit;-webkit-appearance:none;appearance:none;
+    transition:border-color .15s, background .15s, opacity .15s;
+  }
+  .day-pill .dow{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:4px}
+  .day-pill .num{display:block;font-family:Georgia,serif;font-size:20px;color:var(--bright);line-height:1}
+  .day-pill .mon{display:block;font-size:9px;color:var(--mute);margin-top:3px;letter-spacing:.04em;text-transform:uppercase}
+  .day-pill.past{opacity:.55}
+  .day-pill.today{border-color:var(--gold);background:#1a1810}
+  .day-pill.today .dow{color:var(--gold)}
+  .day-pill.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  .day-pill.selected:not(.today){background:#16151c}
+
+  .day-panel{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:14px 16px;min-height:160px;
+  }
+  .day-panel.today-panel{border-color:var(--gold);background:#1a1810}
+  .day-panel .panel-head{display:flex;align-items:baseline;gap:8px;margin:0 0 10px}
+  .day-panel .panel-dow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+  .day-panel .panel-date{font-family:Georgia,serif;font-size:24px;color:var(--bright);font-weight:500}
+  .day-panel .panel-tag{margin-left:auto;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .day-panel ul{margin:0;padding:0;list-style:none}
+  .day-panel li{font-size:14px;padding:8px 0;line-height:1.35;border-bottom:1px solid var(--line)}
+  .day-panel li:last-child{border-bottom:0}
+  .day-panel li .t{display:block;font-size:12px;color:var(--gold);margin-bottom:2px;letter-spacing:.02em}
+  .day-panel li em{color:var(--mute);font-style:normal;font-size:12px}
+  .day-panel li.ideal{opacity:.7}
+  .day-panel li.ideal .t{color:var(--mute)}
+  .day-panel .open-label{color:var(--mute);font-size:14px;margin:4px 0 0;font-style:italic}
+
+  details.fold{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0;margin:0 0 12px}
+  details.fold > summary{
+    list-style:none;cursor:pointer;padding:14px 16px;
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);
+    display:flex;align-items:center;justify-content:space-between;user-select:none;
+  }
+  details.fold > summary::-webkit-details-marker{display:none}
+  details.fold > summary::after{content:"+";font-size:16px;color:var(--mute);font-weight:400}
+  details.fold[open] > summary::after{content:"–"}
+  details.fold .fold-body{padding:0 16px 14px;border-top:1px solid var(--line)}
+  details.fold .fold-body > :first-child{margin-top:10px}
+  details.fold h2{display:none}
+</style>
+</head>
+<body>
+  <p class="eyebrow">Anthony Aguilar · private · this device</p>
+  <h1>The Floor</h1>
+  <p class="pillars">Christ · CALICULT · Family</p>
+
+  <div class="week" aria-label="This week">
+    <h2>This week</h2>
+    <div class="now" id="nowLine"><b>Right now</b> · …</div>
+    <div class="day-strip" id="dayStrip" role="tablist" aria-label="Days"></div>
+    <div class="day-panel today-panel" id="dayPanel" role="tabpanel"></div>
+  </div>
+
+  <div class="hero">
+    <div><b id="daysClean">0</b><span>days clean</span></div>
+    <div><b id="since">day one</b><span>since you set it</span></div>
+    <div><b id="to30">30</b><span>to day 30</span></div>
+  </div>
+  <p class="note" id="withdrawNote"></p>
+  <p class="row" style="margin:10px 0 16px">Day one <input type="date" id="dayOne"></p>
+
+  <details class="fold" open>
+    <summary>Never miss · floor</summary>
+    <div class="fold-body">
+      <label class="tick"><input type="checkbox" data-k="eSet"> One set <small>Emergency day floor</small></label>
+      <label class="tick"><input type="checkbox" data-k="rec1"> Archive 1 <small>Blank stare counts</small></label>
+      <label class="tick"><input type="checkbox" data-k="rec2"> Archive 2</label>
+      <label class="tick"><input type="checkbox" data-k="rec3"> Archive 3</label>
+      <label class="tick"><input type="checkbox" data-k="rec4"> Archive 4</label>
+      <label class="tick"><input type="checkbox" data-k="rec5"> Archive 5</label>
+      <label class="tick"><input type="checkbox" data-k="eMike"> One text to Michael</label>
+      <label class="tick"><input type="checkbox" data-k="water"> Water <small>Half gallon floor · aim a gallon · powder in most</small></label>
+      <label class="tick"><input type="checkbox" data-k="appDaily"> CaliCult app <small>Open it. Work a kink. Not a post. Floor with archive.</small></label>
+      <label class="tick"><input type="checkbox" data-k="line"> The line <small>Clean today. Never miss twice.</small></label>
+      <p class="note">Emergency: one set, one capture, one text to Michael. Do not shame an emergency-only day.</p>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>Grind ticks</summary>
+    <div class="fold-body">
+      <label class="tick"><input type="checkbox" data-k="christ"> CHRIST <small>Scripture, prayer, prostrations. Before the phone. Rope once a day floor · three is the good day.</small></label>
+      <label class="tick"><input type="checkbox" data-k="run"> RUN <small>2 mi min. Days not named.</small></label>
+      <label class="tick"><input type="checkbox" data-k="body"> BODY <small>Trained, ate, water.</small></label>
+      <label class="tick"><input type="checkbox" data-k="cali"> CALICULT <small>Work block + app daily. Five recordings live on never-miss, not as the win.</small></label>
+      <label class="tick"><input type="checkbox" data-k="fam"> FAMILY <small>Reach. Wind-down. The line.</small></label>
+      <label class="tick"><input type="checkbox" data-k="wind"> WIND-DOWN <small>Yoga, lights out. Fifteen on the floor.</small></label>
+      <label class="tick"><input type="checkbox" data-k="sun"> Light · sunrise</label>
+      <label class="tick"><input type="checkbox" data-k="mid"> Light · midday</label>
+      <label class="tick"><input type="checkbox" data-k="gold"> Light · sunset</label>
+      <label class="tick"><input type="checkbox" data-k="night"> Light · late night</label>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>Aim</summary>
+    <div class="fold-body">
+      <p style="margin:0;font-size:14px;line-height:1.45">Q1 off-grid social out.</p>
+      <p style="margin:8px 0 0;font-size:14px;line-height:1.45">CaliCult app daily · floor with archive. Find the kinks. Workout times still open.</p>
+      <p style="margin:8px 0 0;font-size:14px;line-height:1.45">Prove found same place twice.</p>
+      <p style="margin:8px 0 0;font-size:14px;line-height:1.45">Exit thirteen weeks no gap over two.</p>
+      <p style="margin:8px 0 0;font-size:14px;line-height:1.45">MRKT-360 Week 5 proposal ~late Sep / early Oct. CaliCult app + plan ready. Friends-only client.</p>
+      <p class="note">Ideal Sun–Fri: wake 5:00am, workout 6:00am. Sat out. Not never-miss. Shown on each day as ideal, not locked.</p>
+      <p class="note" id="q1"></p>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>In the works</summary>
+    <div class="fold-body">
+      <div class="works"><em>CONTENT</em><br>Yo · send-this list · bit and match · 10k needs a count · mom weekly stream (day open) · Musixmatch lyrics</div>
+      <div class="works"><em>APP</em><br>Tap 228 Undo, 229 hold+chips, 230 bar leftover. Don’t merge. Friends-only.</div>
+      <div class="works"><em>VAN</em><br>Van registered · insured · DV plates. Still open: flooring · wheel-well storage + water tank. Hitch was Monday. HD leftover: wood, lights, holder, mirrors, turf.</div>
+      <div class="works"><em>HOVER</em><br>EE11 was airport. EE105/202 was the room. Yard, face lock, then palm.</div>
+      <div class="works"><em>RIDE</em><br>Motorcycle — photos day AND night (nightlight ~$400 feature) then list to sell. Drop-bar e-road still the want. Not a buy this week.</div>
+      <div class="works"><em>WORK STUDY</em><br>Vanguard Veterans Center · 7am opener in play · business/homework there · not locked.</div>
+      <div class="works"><em>SCHOOL</em><br>BOOKSTORE: return The Pursuit of God to Vanguard bookstore · AID: register for financial aid (open, not locked)</div>
+      <div class="works"><em>HOUSE</em><br>Cast iron: scrub rust, dry, thin oil. Consumption off unless learning or a scheduled share.</div>
+      <div class="works"><em>WEEK MACHINE</em><br>Repeating cook + swim + one review night. Food list open. Do not invent the menu.</div>
+      <div class="works"><em>GLOVES</em><br>One pair for you. Not a run. Michael before inventory.</div>
+    </div>
+  </details>
+
+  <details class="fold">
+    <summary>Money · monthly</summary>
+    <div class="fold-body">
+      <div class="money"><span>VA disability</span><span class="plus">+$4,000</span></div>
+      <div class="money"><span>Rent</span><span class="minus">−$1,600</span></div>
+      <div class="money"><span>Van</span><span class="minus">−$580</span></div>
+      <div class="money"><span>Three loans</span><span class="minus">−$655</span></div>
+      <div class="money"><span>Food</span><span class="minus">−$400</span></div>
+      <div class="money"><span>Gas</span><span class="minus">−$300</span></div>
+      <div class="money"><span>Memberships</span><span class="minus">−$300</span></div>
+      <div class="money"><span>Phone</span><span class="minus">−$115</span></div>
+      <div class="money"><span>Left after those</span><span>$50</span></div>
+      <div class="money"><span>Debt ~21 Aug</span><span>~$16,000</span></div>
+      <div class="money"><span>Savings</span><span>$9,000</span></div>
+      <p class="note">School-month BAH sits on top. This is a budget, not a bank. Private. Not staff.</p>
+      <div class="money" style="margin-top:10px"><span>Classes begin</span><span id="dClass"></span></div>
+      <div class="money"><span>PatientFi</span><span id="dFi"></span></div>
+      <div class="money"><span>Graduation</span><span id="dGrad"></span></div>
+      <div class="money"><span>Two years</span><span id="dTwo"></span></div>
+    </div>
+  </details>
+
+  <p class="foot">Saved on this device only. Never miss twice. Five recordings. FIRST HOUR cut.</p>
+  <p><button type="button" id="clearTicks">Clear today’s ticks</button></p>
+
+<script>
+const KEY = "floor-v2";
+let S = {};
+try { S = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e) { S = {}; }
+if (location.hash.length > 8) {
+  try { S = Object.assign(S, JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))))); } catch(e) {}
+}
+if (!S.dayOne) S.dayOne = "2026-08-21";
+if (S.footage == null) S.footage = 0;
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {}
+  try { history.replaceState(null, "", "#" + btoa(unescape(encodeURIComponent(JSON.stringify(S))))); } catch(e) {}
+}
+function daysBetween(a,b){ return Math.floor((b - a) / 86400000); }
+
+/* —— Live week: Mon–Sun from America/Los_Angeles clock —— */
+const TZ = "America/Los_Angeles";
+const IDEAL = { t: "5:00–6:00am", title: "Wake · workout", note: "ideal · not never-miss", ideal: true };
+const MONS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW_FULL = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+function laParts(d){
+  const f = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", weekday: "short"
+  });
+  const p = Object.fromEntries(f.formatToParts(d).filter(x => x.type !== "literal").map(x => [x.type, x.value]));
+  return {
+    year: +p.year, month: +p.month, day: +p.day,
+    weekday: p.weekday,
+    iso: p.year + "-" + p.month + "-" + p.day
+  };
+}
+function addDaysISO(iso, n){
+  const [y,m,d] = iso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d + n));
+  return dt.getUTCFullYear() + "-" + String(dt.getUTCMonth()+1).padStart(2,"0") + "-" + String(dt.getUTCDate()).padStart(2,"0");
+}
+function mondayOfWeek(iso){
+  const [y,m,d] = iso.split("-").map(Number);
+  const wd = new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay();
+  const fromMon = (wd + 6) % 7;
+  return addDaysISO(iso, -fromMon);
+}
+function diffISO(a, b){
+  const [ay,am,ad] = a.split("-").map(Number);
+  const [by,bm,bd] = b.split("-").map(Number);
+  return Math.round((Date.UTC(by,bm-1,bd) - Date.UTC(ay,am-1,ad)) / 86400000);
+}
+function partsFromISO(iso){
+  const [y,m,d] = iso.split("-").map(Number);
+  const wd = new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay();
+  return { iso, year: y, month: m, day: d, dow: DOW_FULL[wd], num: String(d), mon: MONS[m-1] };
+}
+
+const RECUR = {
+  Mon: [
+    IDEAL,
+    { t: "2:30–3:45pm", title: "Foundations of Christian Life", note: "Heath 105 · waitlist · attending" },
+    { t: "4:00–5:15pm", title: "Old Testament", note: "Heath 107" },
+    { t: "7:15pm", title: "Men’s book club" }
+  ],
+  Tue: [
+    IDEAL,
+    { t: "12:10–1:25pm", title: "Intro to PR", note: "Heath 103" },
+    { t: "6:00–9:00pm", title: "Marketing", note: "Heath 105" },
+    { t: "8:00–9:00pm", title: "St Monica", note: "make-it · sits on Marketing" },
+    { t: "9:00–11:00pm", title: "Calisthenics Meet", note: "New Hope Academy" }
+  ],
+  Wed: [
+    IDEAL,
+    { t: "8:00–11:00am", title: "Liturgy" },
+    { t: "11:00am", title: "Creative Process", note: "COMM-317 · Heath 212" },
+    { t: "2:30–3:45pm", title: "Foundations of Christian Life", note: "Heath 105 · waitlist · attending" },
+    { t: "4:00–5:15pm", title: "Old Testament", note: "Heath 107" },
+    { t: "6:00pm", title: "Newport Run Club", note: "optional" },
+    { t: "7:00pm", title: "Bible" }
+  ],
+  Thu: [
+    IDEAL,
+    { t: "12:10–1:25pm", title: "Intro to PR", note: "Heath 103" },
+    { t: "7:00–8:30pm", title: "Mariners", note: "chosen" }
+  ],
+  Fri: [ IDEAL ],
+  Sat: [],
+  Sun: [
+    IDEAL,
+    { t: "8:00am–12:00pm", title: "Liturgy", note: "St. Paul" },
+    { t: "2:00pm", title: "Run", note: "2 mi min" },
+    { t: "4:00pm", title: "Archive dump" },
+    { t: "7:30pm", title: "CALICULT LIVE", note: "still on board · Q1 off-grid open question" }
+  ]
+};
+
+/* Dated one-offs — only when iso matches (not every weekday forever) */
+const ONE_OFFS = [
+  { iso: "2026-09-02", ev: { t: "11:59pm", title: "OT reflection due", note: "Canvas" } },
+  { iso: "2026-09-04", ev: { t: "11:59pm", title: "Marketing intro / Ch.1 / challenge due", note: "Canvas" } }
+];
+
+function eventSortKey(ev){
+  const s = String(ev.t || "");
+  const m = s.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+  if (!m) return 9999;
+  let h = +m[1], min = m[2] ? +m[2] : 0;
+  let ap = (m[3] || "").toLowerCase();
+  if (!ap) {
+    const all = s.match(/(am|pm)/ig);
+    if (all && all.length) ap = all[0].toLowerCase();
+  }
+  if (ap === "pm" && h < 12) h += 12;
+  if (ap === "am" && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function buildDays(){
+  const today = laParts(new Date());
+  const mon = mondayOfWeek(today.iso);
+  const days = [];
+  for (let i = 0; i < 7; i++){
+    const iso = addDaysISO(mon, i);
+    const p = partsFromISO(iso);
+    const base = (RECUR[p.dow] || []).map(e => Object.assign({}, e));
+    const extras = ONE_OFFS.filter(o => o.iso === iso).map(o => Object.assign({}, o.ev));
+    let events = base.concat(extras).sort((a,b) => eventSortKey(a) - eventSortKey(b));
+    const day = {
+      key: p.dow.toLowerCase() + p.num,
+      dow: p.dow, num: p.num, mon: p.mon, iso,
+      today: iso === today.iso,
+      past: diffISO(iso, today.iso) > 0,
+      events
+    };
+    if (p.dow === "Sat") {
+      day.open = "open · no early wake";
+      day.events = [];
+    } else if (p.dow === "Fri") {
+      const hasMkt = extras.some(e => /Marketing intro/i.test(e.title));
+      if (!hasMkt) {
+        day.events = [];
+        day.open = "open";
+        day.ideal = true;
+      }
+    }
+    days.push(day);
+  }
+  return { days, todayISO: today.iso };
+}
+
+const _week = buildDays();
+const DAYS = _week.days;
+const TODAY_ISO = _week.todayISO;
+
+let selected = DAYS.findIndex(d => d.today);
+if (selected < 0) selected = 0;
+
+function shortEv(ev){
+  let name = ev.title
+    .replace("Foundations of Christian Life", "Foundations")
+    .replace("Old Testament", "OT")
+    .replace("Intro to PR", "PR")
+    .replace("Calisthenics Meet", "New Hope")
+    .replace("Newport Run Club", "Newport")
+    .replace("Marketing intro / Ch.1 / challenge due", "Marketing due")
+    .replace("Men’s book club", "book club")
+    .replace("Archive dump", "archive");
+  if (/OT reflection due/i.test(ev.title)) return "OT reflection due tonight";
+  if (/Marketing due/i.test(name)) return "Marketing due tonight";
+  if (/DMV/i.test(ev.title)) return "DMV 3pm";
+  /* Keep full start–end ranges; compact :00 only. Never strip am/pm (end period must stay). */
+  let t = String(ev.t || "").replace(/:00/g, "");
+  const opt = /optional/i.test(ev.note || "") ? " optional" : "";
+  if (/Newport/i.test(name)) return "Newport optional " + t;
+  if (/St Monica/i.test(name)) return "St Monica sits on Marketing";
+  if (/New Hope/i.test(name)) return "New Hope " + t;
+  return (name + " " + t + opt).trim();
+}
+
+function renderNow(){
+  const d = DAYS.find(x => x.today) || DAYS[selected];
+  const el = document.getElementById("nowLine");
+  if (!el || !d) return;
+  const locked = (d.events || []).filter(e => !e.ideal);
+  let body;
+  if (!locked.length) {
+    body = d.open || "open";
+  } else {
+    const titles = locked.map(e => e.title);
+    const hasFound = titles.some(t => /Foundations/.test(t));
+    const hasOT = titles.some(t => t === "Old Testament");
+    const bits = [];
+    for (const e of locked) {
+      if (hasFound && hasOT && /Foundations/.test(e.title)) { bits.push("class afternoon"); continue; }
+      if (hasFound && hasOT && e.title === "Old Testament") continue;
+      bits.push(shortEv(e));
+    }
+    body = bits.join(" · ");
+  }
+  el.innerHTML = "<b>Right now</b> · " + d.dow + " · " + body;
+}
+
+function renderStrip(){
+  const strip = document.getElementById("dayStrip");
+  strip.innerHTML = DAYS.map((d, i) => {
+    const cls = ["day-pill"];
+    if (d.past) cls.push("past");
+    if (d.today) cls.push("today");
+    if (i === selected) cls.push("selected");
+    return `<button type="button" class="${cls.join(" ")}" role="tab" aria-selected="${i===selected}" data-i="${i}" id="tab-${d.key}">
+      <span class="dow">${d.dow}</span>
+      <span class="num">${d.num}</span>
+      <span class="mon">${d.mon}</span>
+    </button>`;
+  }).join("");
+  strip.querySelectorAll(".day-pill").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selected = +btn.dataset.i;
+      renderStrip();
+      renderPanel();
+    });
+  });
+}
+
+function renderPanel(){
+  const d = DAYS[selected];
+  const panel = document.getElementById("dayPanel");
+  panel.className = "day-panel" + (d.today ? " today-panel" : "");
+  const tag = d.today ? "today" : (d.past ? "past" : "");
+  let body = "";
+  if (d.events && d.events.length) {
+    body = "<ul>" + d.events.map(ev => {
+      const idealCls = ev.ideal ? " class=\"ideal\"" : "";
+      const note = ev.note ? ` <em>${ev.note}</em>` : "";
+      return `<li${idealCls}><span class="t">${ev.t}${ev.ideal ? " · ideal" : ""}</span>${ev.title}${note}</li>`;
+    }).join("") + "</ul>";
+  } else if (d.open) {
+    let extra = "";
+    if (d.ideal) {
+      extra = `<ul><li class="ideal"><span class="t">5:00–6:00am · ideal</span>Wake · workout <em>ideal · not never-miss</em></li></ul>`;
+    }
+    body = `<p class="open-label">${d.open}</p>${extra}`;
+  } else {
+    body = `<p class="open-label">open</p>`;
+  }
+  panel.innerHTML = `<div class="panel-head">
+    <span class="panel-dow">${d.dow}</span>
+    <span class="panel-date">${d.num} ${d.mon}</span>
+    ${tag ? `<span class="panel-tag">${tag}</span>` : ""}
+  </div>${body}`;
+}
+
+renderNow();
+renderStrip();
+renderPanel();
+
+
+function refreshClean(){
+  let n = diffISO(S.dayOne, TODAY_ISO);
+  if (n < 0) n = 0;
+  document.getElementById("daysClean").textContent = n;
+  document.getElementById("since").textContent = S.dayOne.slice(5);
+  document.getElementById("to30").textContent = Math.max(0, 30 - n);
+  const el = document.getElementById("withdrawNote");
+  if (n <= 2) el.textContent = "Tell Michael if you haven’t. Quiet quits fail more.";
+  else if (n <= 7) el.textContent = "Flat and grey is withdrawal on schedule. Sleep comes back last.";
+  else if (n <= 21) el.textContent = "The sharp part is behind you. Sleep can stay strange.";
+  else el.textContent = "Keep the line. Don’t miss twice.";
+}
+document.getElementById("dayOne").value = S.dayOne;
+document.getElementById("dayOne").onchange = e => { S.dayOne = e.target.value; save(); refreshClean(); };
+document.querySelectorAll("input[data-k]").forEach(el => {
+  el.checked = !!S[el.dataset.k];
+  el.addEventListener("change", () => {
+    S[el.dataset.k] = el.checked;
+    if (el.dataset.k === "line") S.line = el.checked;
+    save(); refreshClean();
+  });
+});
+
+function labelDaysISO(targetIso){
+  const n = diffISO(TODAY_ISO, targetIso);
+  if (n === 0) return "today";
+  if (n > 0) return n + "d";
+  return Math.abs(n) + "d ago";
+}
+document.getElementById("q1").textContent = "Q1 · " + labelDaysISO("2026-09-01");
+document.getElementById("dClass").textContent = labelDaysISO("2026-08-31");
+document.getElementById("dFi").textContent = labelDaysISO(addDaysISO(TODAY_ISO, 620));
+document.getElementById("dGrad").textContent = labelDaysISO(addDaysISO(TODAY_ISO, 631));
+document.getElementById("dTwo").textContent = labelDaysISO(addDaysISO(TODAY_ISO, 739));
+refreshClean();
+document.getElementById("clearTicks").onclick = () => {
+  document.querySelectorAll("input[data-k]").forEach(el => {
+    el.checked = false; S[el.dataset.k] = false;
+  });
+  S.line = false; save(); refreshClean();
+};
+</script>
+</body>
+</html>
